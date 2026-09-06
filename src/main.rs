@@ -15,7 +15,7 @@ use ray_tracing::{
     vec3::{Point3, Vec3},
 };
 
-fn ray_color(r: &Ray, world: &dyn Hittable, bounces: i32) -> Color {
+fn ray_color(r: &Ray, world: &impl Hittable, bounces: i32) -> Color {
     if bounces <= 0 {
         //Out of bounces, no more light gathering
         return Color::new(0.0, 0.0, 0.0);
@@ -101,7 +101,7 @@ fn main() {
     const ASPECT_RATIO: f64 = 3.0 / 2.0;
     const IMAGE_WIDTH: i32 = 1200;
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
-    const SAMPLES_PER_PIXEL: i32 = 50;
+    const SAMPLES_PER_PIXEL: i32 = 250;
     const MAX_BOUNCES: i32 = 50;
 
     // World
