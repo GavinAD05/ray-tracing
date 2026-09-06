@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::hittable::{HitRecord, Hittable};
 use crate::material::Material;
 use crate::ray::Ray;
@@ -8,11 +6,11 @@ use crate::vec3::{self, Point3};
 pub struct Sphere {
     center: Point3,
     radius: f64,
-    mat: Arc<dyn Material>,
+    mat: Material,
 }
 
 impl Sphere {
-    pub fn new(cen: Point3, r: f64, m: Arc<dyn Material>) -> Self {
+    pub fn new(cen: Point3, r: f64, m: Material) -> Self {
         Sphere {
             center: cen,
             radius: r,
@@ -45,12 +43,61 @@ impl Hittable for Sphere {
         let mut rec = HitRecord {
             t: root,
             p: r.at(root),
-            mat: Some(self.mat.clone()),
+            mat: self.mat,
             normal: Default::default(),
             front_face: Default::default(),
         };
         let outward_normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(r, outward_normal);
         Some(rec)
+    }
+}
+
+pub enum Shape {
+    Sphere(Sphere),
+}
+
+impl Hittable for Shape {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        match self {
+            Shape::Sphere(shape) => shape.hit(r, t_min, t_max),
+        }
+    }
+}
+
+impl From<Sphere> for Shape {
+    fn from(value: Sphere) -> Self {
+        Shape::Sphere(value)
+    }
+}
+
+#[derive(Default)]
+pub struct HittableList {
+    objects: Vec<Shape>,
+}
+
+impl HittableList {
+    pub fn new() -> Self {
+        Default::default()
+    }
+
+    pub fn add(&mut self, object: Shape) {
+        self.objects.push(object);
+    }
+}
+
+impl Hittable for HittableList {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        let mut temp_rec = None;
+        let mut closest_so_far = t_max;
+
+        for object in &self.objects {
+            if let Some(rec) = object.hit(ray, t_min, closest_so_far) {
+                closest_so_far = rec.t;
+                temp_rec = Some(rec);
+            }
+        }
+
+        temp_rec
     }
 }

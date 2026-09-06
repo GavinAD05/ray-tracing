@@ -8,10 +8,42 @@ pub struct ScatterRecord {
     pub scattered: Ray,
 }
 
-pub trait Material: Send + Sync {
-    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterRecord>;
+#[derive(Copy, Clone)]
+pub enum Material {
+    Lambertian(Lambertian),
+    Metal(Metal),
+    Dielectric(Dielectric),
 }
 
+impl Material {
+   pub fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterRecord> {
+        match self {
+            Material::Lambertian(mat) => mat.scatter(r_in, rec),
+            Material::Metal(mat) => mat.scatter(r_in, rec),
+            Material::Dielectric(mat) => mat.scatter(r_in, rec),
+        }
+    }
+}
+
+impl From<Lambertian> for Material {
+    fn from(value: Lambertian) -> Self {
+        Self::Lambertian(value)
+    }
+}
+
+impl From<Metal> for Material {
+    fn from(value: Metal) -> Self {
+        Self::Metal(value)
+    }
+}
+
+impl From<Dielectric> for Material {
+    fn from(value: Dielectric) -> Self {
+        Self::Dielectric(value)
+    }
+}
+
+#[derive(Copy, Clone)]
 pub struct Lambertian {
     albedo: Color,
 }
@@ -20,9 +52,7 @@ impl Lambertian {
     pub fn new(a: Color) -> Lambertian {
         Lambertian { albedo: a }
     }
-}
 
-impl Material for Lambertian {
     fn scatter(&self, _r_in: &Ray, rec: &HitRecord) -> Option<ScatterRecord> {
         let mut scatter_direction = rec.normal + vec3::random_unit_vector();
 
@@ -37,6 +67,7 @@ impl Material for Lambertian {
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct Metal {
     albedo: Color,
     fuzz: f64,
@@ -49,9 +80,7 @@ impl Metal {
             fuzz: if f < 1.0 { f } else { 1.0 },
         }
     }
-}
 
-impl Material for Metal {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterRecord> {
         let reflected = vec3::reflect(vec3::unit_vector(r_in.direction()), rec.normal);
         let scattered = Ray::new(rec.p, reflected + self.fuzz * vec3::random_in_unit_sphere());
@@ -67,6 +96,7 @@ impl Material for Metal {
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct Dielectric {
     ir: f64, //index of refraction
 }
@@ -84,9 +114,7 @@ impl Dielectric {
         r0 = r0 * r0;
         r0 + (1.0 - r0) * f64::powf(1.0 - cosine, 5.0)
     }
-}
 
-impl Material for Dielectric {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterRecord> {
         let refraction_ratio = if rec.front_face {
             1.0 / self.ir
