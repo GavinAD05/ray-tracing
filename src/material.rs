@@ -16,7 +16,7 @@ pub enum Material {
 }
 
 impl Material {
-   pub fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterRecord> {
+    pub fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterRecord> {
         match self {
             Material::Lambertian(mat) => mat.scatter(r_in, rec),
             Material::Metal(mat) => mat.scatter(r_in, rec),
