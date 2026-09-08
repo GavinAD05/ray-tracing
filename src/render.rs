@@ -31,10 +31,12 @@ pub fn render(
     camera: Camera,
     world: impl Hittable,
     image_width: i32,
-    image_height: i32,
+    aspect_ratio: f64,
     max_bounces: i32,
     samples_per_pixel: i32,
 ) {
+    let image_height = (image_width as f64 / aspect_ratio) as i32;
+
     print!("P3\n{} {}\n255\n", image_width, image_height);
 
     for j in (0..image_height).rev() {

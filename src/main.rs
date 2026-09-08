@@ -7,11 +7,11 @@ use ray_tracing::{
 fn main() {
     // Image
 
-    const ASPECT_RATIO: f64 = 3.0 / 2.0;
-    const IMAGE_WIDTH: i32 = 1200;
-    const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
-    const SAMPLES_PER_PIXEL: i32 = 250;
-    const MAX_BOUNCES: i32 = 50;
+    const ASPECT_RATIO: f64 = 16.0 / 9.0;
+    const IMAGE_WIDTH: i32 = 2560;
+    // const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
+    const SAMPLES_PER_PIXEL: i32 = 10;
+    const MAX_BOUNCES: i32 = 25;
 
     // World
 
@@ -40,7 +40,7 @@ fn main() {
         cam,
         world,
         IMAGE_WIDTH,
-        IMAGE_HEIGHT,
+        ASPECT_RATIO,
         MAX_BOUNCES,
         SAMPLES_PER_PIXEL,
     );
