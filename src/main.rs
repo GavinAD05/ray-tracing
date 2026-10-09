@@ -1,29 +1,22 @@
 use ray_tracing::{
     camera::Camera,
-    render, scene,
+    scene,
     vec3::{Point3, Vec3},
 };
 
 fn main() {
-    // Image
-
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: i32 = 2560;
-    // const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
     const SAMPLES_PER_PIXEL: i32 = 10;
     const MAX_BOUNCES: i32 = 25;
 
-    // World
-
     let world = scene::random_scene();
-
-    // Camera
 
     let lookfrom = Point3::new(13.0, 2.0, 3.0);
     let lookat = Point3::new(0.0, 0.0, 0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
-    let aperature = 0.1;
+    let aperture = 0.1;
 
     let cam = Camera::new(
         lookfrom,
@@ -31,17 +24,12 @@ fn main() {
         vup,
         20.0,
         ASPECT_RATIO,
-        aperature,
+        aperture,
         dist_to_focus,
-    );
-
-    //Render
-    render::render(
-        cam,
-        world,
         IMAGE_WIDTH,
-        ASPECT_RATIO,
         MAX_BOUNCES,
         SAMPLES_PER_PIXEL,
     );
+
+    cam.render(&world);
 }

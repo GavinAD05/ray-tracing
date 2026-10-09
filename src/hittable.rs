@@ -1,3 +1,4 @@
+use crate::interval::Interval;
 use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::{self, Point3, Vec3};
@@ -22,9 +23,10 @@ impl HitRecord {
 }
 
 pub trait Hittable: Send + Sync {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+    fn hit(&self, ray: &Ray, ray_t: Interval) -> Option<HitRecord>;
 }
 
+#[derive(Default)]
 pub struct HittableList<T: Hittable> {
     objects: Vec<T>,
 }
@@ -42,12 +44,12 @@ impl<T: Hittable> HittableList<T> {
 }
 
 impl<T: Hittable> Hittable for HittableList<T> {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, ray_t: Interval) -> Option<HitRecord> {
         let mut temp_rec = None;
-        let mut closest_so_far = t_max;
+        let mut closest_so_far = ray_t.max;
 
         for object in &self.objects {
-            if let Some(rec) = object.hit(ray, t_min, closest_so_far) {
+            if let Some(rec) = object.hit(ray, Interval::new(ray_t.min, closest_so_far)) {
                 closest_so_far = rec.t;
                 temp_rec = Some(rec);
             }

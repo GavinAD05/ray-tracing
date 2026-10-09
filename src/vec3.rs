@@ -5,12 +5,14 @@ use crate::common;
 
 #[derive(Copy, Clone, Default)]
 pub struct Vec3 {
-    e: [f64; 3],
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
-        Vec3 { e: [x, y, z] }
+        Vec3 { x, y, z }
     }
 
     pub fn random() -> Vec3 {
@@ -29,30 +31,18 @@ impl Vec3 {
         )
     }
 
-    pub fn x(&self) -> f64 {
-        self.e[0]
-    }
-
-    pub fn y(&self) -> f64 {
-        self.e[1]
-    }
-
-    pub fn z(&self) -> f64 {
-        self.e[2]
-    }
-
     pub fn length(&self) -> f64 {
         f64::sqrt(self.length_squared())
     }
 
     pub fn length_squared(&self) -> f64 {
-        self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]
+        self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     pub fn near_zero(&self) -> bool {
         const ESP: f64 = 1.0e-8;
 
-        self.e[0].abs() < ESP && self.e[1].abs() < ESP && self.e[2].abs() < ESP
+        self.x.abs() < ESP && self.y.abs() < ESP && self.z.abs() < ESP
     }
 }
 
@@ -61,7 +51,7 @@ pub type Point3 = Vec3;
 
 impl Display for Vec3 {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "{} {} {}", self.e[0], self.e[1], self.e[2])
+        write!(f, "{} {} {}", self.x, self.y, self.z)
     }
 }
 
@@ -69,7 +59,7 @@ impl Neg for Vec3 {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
-        Vec3::new(-self.x(), -self.y(), -self.z())
+        Vec3::new(-self.x, -self.y, -self.z)
     }
 }
 
@@ -77,7 +67,7 @@ impl Add for Vec3 {
     type Output = Self;
 
     fn add(self, v: Self) -> Self::Output {
-        Vec3::new(self.x() + v.x(), self.y() + v.y(), self.z() + v.z())
+        Vec3::new(self.x + v.x, self.y + v.y, self.z + v.z)
     }
 }
 
@@ -85,7 +75,7 @@ impl Sub for Vec3 {
     type Output = Self;
 
     fn sub(self, v: Self) -> Self::Output {
-        Vec3::new(self.x() - v.x(), self.y() - v.y(), self.z() - v.z())
+        Vec3::new(self.x - v.x, self.y - v.y, self.z - v.z)
     }
 }
 
@@ -93,7 +83,7 @@ impl Mul for Vec3 {
     type Output = Self;
 
     fn mul(self, v: Self) -> Self::Output {
-        Vec3::new(self.x() * v.x(), self.y() * v.y(), self.z() * v.z())
+        Vec3::new(self.x * v.x, self.y * v.y, self.z * v.z)
     }
 }
 
@@ -101,7 +91,7 @@ impl Mul<f64> for Vec3 {
     type Output = Vec3;
 
     fn mul(self, t: f64) -> Self::Output {
-        Vec3::new(self.x() * t, self.y() * t, self.z() * t)
+        Vec3::new(self.x * t, self.y * t, self.z * t)
     }
 }
 
@@ -109,7 +99,7 @@ impl Mul<Vec3> for f64 {
     type Output = Vec3;
 
     fn mul(self, v: Vec3) -> Self::Output {
-        Vec3::new(self * v.x(), self * v.y(), self * v.z())
+        Vec3::new(self * v.x, self * v.y, self * v.z)
     }
 }
 
@@ -117,7 +107,7 @@ impl Div<f64> for Vec3 {
     type Output = Vec3;
 
     fn div(self, t: f64) -> Self::Output {
-        Vec3::new(self.x() / t, self.y() / t, self.z() / t)
+        Vec3::new(self.x / t, self.y / t, self.z / t)
     }
 }
 
@@ -140,14 +130,14 @@ impl DivAssign<f64> for Vec3 {
 }
 
 pub fn dot(u: Vec3, v: Vec3) -> f64 {
-    u.x() * v.x() + u.y() * v.y() + u.z() * v.z()
+    u.x * v.x + u.y * v.y + u.z * v.z
 }
 
 pub fn cross(u: Vec3, v: Vec3) -> Vec3 {
     Vec3::new(
-        u.y() * v.z() - u.z() * v.y(),
-        u.z() * v.x() - u.x() * v.z(),
-        u.x() * v.y() - u.y() * v.x(),
+        u.y * v.z - u.z * v.y,
+        u.z * v.x - u.x * v.z,
+        u.x * v.y - u.y * v.x,
     )
 }
 
